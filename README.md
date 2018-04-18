@@ -1,5 +1,7 @@
-
 # csvpp
+
+![GitHub release](https://img.shields.io/github/release/qubyte/rubidium.svg)
+
 
 **csvpp** is a header only library for CSV parsing. It is written in modern C++ and proudly adhering strictly to [RFC4180](https://tools.ietf.org/html/rfc4180).
 
