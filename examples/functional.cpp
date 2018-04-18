@@ -1,4 +1,4 @@
-#include "csv.h"
+#include "../csv.h"
 #include <iostream>
 #include <sstream>
 #include <tuple>
@@ -160,8 +160,13 @@ void by_position()
 		std::cout << c.price << "\t" << car::to_string(c.make) << "\t" << c.model << std::endl;
 }
 
+
 int main()
 {
+    //csv(stringstream) // range con tutti
+    //csv(from(ss1, ss2).select(ss1,0).where([](ss1_line, ss2_line, ...)->bool).order_by(ss1,0,dec))
+    //                   select_first
+    //                   select_last
 	by_name();
 	by_position();
 	return 0;
