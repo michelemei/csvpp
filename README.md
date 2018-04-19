@@ -17,9 +17,18 @@ It's possible to define the callback with:
  * structures that have overridden the operator `()`.
 
 > **CSV in examples**
+>
 > The following code snippet always use a CSV taken from [Wikipedia](https://en.wikipedia.org/wiki/Comma-separated_values):
+>
+> | Year |  Make |                  Model                 |            Description                  |  Price  |
+> |------|:-----:|:--------------------------------------:|:---------------------------------------:|:-------:|
+> | 1997 | Ford  | E350                                   | ac, abs, moon                           | 3000.00 |
+> | 1999 | Chevy | Venture "Extended Edition"             |                                         | 4900.00 |
+> | 1999 | Chevy | Venture "Extended Edition, Very Large" |                                         | 5000.00 |
+> | 1996 | Jeep  | Grand Cherokee                         | MUST SELL!<br /> air, moon roof, loaded | 4799.00 |
+>
 > ```cpp
-> static std::string cars = "<Year>,Make,Model,Des.cription,P_rice\n"
+> static std::string cars = "Year,Make,Model,Description,Price\n"
 >	"1997,Ford,E350,\"ac, abs, moon\",3000.00\n"
 >	"1999,Chevy,\"Venture \"\"Extended Edition\"\"\",\"\",4900.00\n"
 >	"1999,Chevy,\"Venture \"\"Extended Edition, Very Large\"\"\",, 5000.00\n"
