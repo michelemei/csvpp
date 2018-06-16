@@ -1,15 +1,25 @@
 # csvpp
 
-[![GitHub release](https://img.shields.io/badge/release-0.1.0-blue.svg)](https://github.com/michelemei/csvpp/blob/master/csv.h)
+**csvpp** is a header only library for CSV parsing. It is written in modern C++ and proudly adhering to [RFC4180](https://tools.ietf.org/html/rfc4180).
 
-**csvpp** is a header only library for CSV parsing. It is written in modern C++ and proudly adhering strictly to [RFC4180](https://tools.ietf.org/html/rfc4180).
+Main features:
+* ready to be used in asynchronous programming context,
+* separator character can be chosen or determined automatically,
+* it can work with unicode files,
+* it can work with binary files.
 
-## Examples
+## Getting started
 
-### Functional Programming
+**csvpp** is an header only library, so you have only to:
 
-If you love functional programming, parse_csv is the one for you!
-`parse_csv` offers a callback that is invoked whenever a line is read in the CSV file. The callback has only one parameter of type `csv_line&`. The csv_line structure is an inneritance of a string vector, with some methods to support string processing. Through the return value of the callback it is possible to stop the processing of the file, which will resume from the point where you stopped in case of new call. You can read the CSV asynchronously!
+ * include `csv.hpp` in your project,
+ * call `parse_csv` function. 
+
+`csv_line` takes two parameters:
+ * an *input stream*: the only requirement is that the stream derives from [std::basic_istream](http://it.cppreference.com/w/cpp/io/basic_istream),
+ * a callback function.
+
+It offers a callback that is invoked whenever a line is read in the CSV file. The callback accepts a string vector as a parameter, and returns a bool. Through the return value of the callback it is possible to stop the processing of the file, which will resume from the point where you stopped in case of new call. You can read the CSV asynchronously!
 
 It's possible to define the callback with:
  * modern lambda functions,
@@ -17,81 +27,48 @@ It's possible to define the callback with:
  * structures that have overridden the operator `()`.
 
 > **CSV in examples**
->
-> The following code snippet always use a CSV taken from [Wikipedia](https://en.wikipedia.org/wiki/Comma-separated_values):
->
-> | Year |  Make |                  Model                 |            Description                  |  Price  |
-> |------|:-----:|:--------------------------------------:|:---------------------------------------:|:-------:|
-> | 1997 | Ford  | E350                                   | ac, abs, moon                           | 3000.00 |
-> | 1999 | Chevy | Venture "Extended Edition"             |                                         | 4900.00 |
-> | 1999 | Chevy | Venture "Extended Edition, Very Large" |                                         | 5000.00 |
-> | 1996 | Jeep  | Grand Cherokee                         | MUST SELL!<br /> air, moon roof, loaded | 4799.00 |
->
+> The following code snippets use a CSV taken from [Wikipedia](https://en.wikipedia.org/wiki/Comma-separated_values):
 > ```cpp
 > static std::string cars = "Year,Make,Model,Description,Price\n"
->	"1997,Ford,E350,\"ac, abs, moon\",3000.00\n"
->	"1999,Chevy,\"Venture \"\"Extended Edition\"\"\",\"\",4900.00\n"
->	"1999,Chevy,\"Venture \"\"Extended Edition, Very Large\"\"\",, 5000.00\n"
->	"1996,Jeep,Grand Cherokee,\"MUST SELL!\n"
->	"air, moon roof, loaded\",4799.00";
+>    "1997,Ford,E350,\"ac, abs, moon\",3000.00\n"
+>    "1999,Chevy,\"Venture \"\"Extended Edition\"\"\",\"\",4900.00\n"
+>    "1999,Chevy,\"Venture \"\"Extended Edition, Very Large\"\"\",, 5000.00\n"
+>    "1996,Jeep,Grand Cherokee,\"MUST SELL!\n"
+>    "air, moon roof, loaded\",4799.00";
 > ```
- 
- #### Lambda
- 
+
+### First Example
+
 ```cpp
-auto ss = std::stringstream(cars); // a generic std :: basic_istream is also allowed
+auto input = std::stringstream(cars); // a generic std :: basic_istream is also allowed
 size_t row = 0;                    // a simple counter
-parse_csv(ss, [&](auto& fields)
-{
+parse_csv(input, [&](auto& fields) {
     std::cout << row++ << " | ";
     for (size_t col = 0; col < fields.size(); ++col)
-    {
         std::cout << fields[col] << "\t";
-    }
+
     std::cout << std::endl;
     return true; // it's possible to stop the processing returning false
 });
 ```
 
-#### Simple function
+### Header parsing example
+
+You can manually read a single line of csv using `parse_csv_line` function. For example it's usefull when you have to parse header line. `parse_csv_line` is similar to `parse_csv`, it takes the same parameter except callback function and it return a vector of strings.
 
 ```cpp
-bool printer(csv_line<std::string::value_type, std::string::traits_type> & fields)
-{
-    for (size_t col = 0; col < fields.size(); ++col)
-    {
-        std::cout << fields[col] << "\t";
-    }
-    std::cout << std::endl;
-    return true; // it's possible to stop the processing returning false
-}
+// ... 
+// extract from example.cpp
 
-int main()
-{
-    auto ss = std::stringstream(cars); // a generic std :: basic_istream is also allowed
-    parse_csv(ss, printer);
-}
+auto header = parse_csv_line(input, delimiter);
+parse_csv(input, delimiter, [&](auto& fields) {
+    car local;
+    for (size_t index = 0; index < fields.size(); ++index)
+        assemble_car(local, header[index], fields[index]);
+
+    garage.push_back(local);
+    return true;
+});
+// ...
 ```
 
-#### Structure
-
-```cpp
-struct printer {
-    bool operator()(csv_line<std::string::value_type, std::string::traits_type> & fields)
-    {
-        for (size_t col = 0; col < fields.size(); ++col)
-        {
-            std::cout << fields[col] << "\t";
-        }
-        std::cout << std::endl;
-        return true;
-    }
-};
-
-int main()
-{
-    auto ss = std::stringstream(cars); // a generic std :: basic_istream is also allowed
-    printer p;
-    parse_csv(ss, p);
-}
-```

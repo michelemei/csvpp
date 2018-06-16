@@ -22,11 +22,8 @@
 ################################################################################
 
 # [ HEADER ]
-cmake_minimum_required (VERSION 3.10.1)
+cmake_minimum_required (VERSION 3.9.1)
 project (csvpp)
 
-# [ TEST ]
-add_executable(csvpp_test src/test.cpp)
-
-# [ EXAMPLES ]
-add_executable(functional examples/functional.cpp)
+# [ EXAMPLE ]
+add_executable(example example.cpp)
